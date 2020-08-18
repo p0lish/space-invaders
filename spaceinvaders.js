@@ -1,5 +1,5 @@
-welcomeDraw = function (game, dt, ctx) {
-  const charmap = 'q wertyuiopasdfghjklzxcvbnm'
+welcomeDraw = function (game, ctx) {
+  const charmap = 'qwertyuiop[]asdfghjkl;\zxcvbnm,./±!@#$%^&*()_+-='
   ctx.clearRect(0, 0, game.width, game.height);
   ctx.font = "30px Arial";
   ctx.fillStyle = '#ffffff';
@@ -20,8 +20,7 @@ welcomeDraw = function (game, dt, ctx) {
   ctx.fillText(charmap.toUpperCase(), game.width / 2, game.height / 2 + 220)
 };
 
-const drawInvaders = (game, ctx) => {
-  let frame = 0
+const controlInvaders = (game) => {
   if (game.invaderspeed < game.gameSpeed) { game.invaderspeed += 1 } else {
     fr = game['frame'] ? game['frame'] = 0 : game['frame'] = 1
 
@@ -37,11 +36,27 @@ const drawInvaders = (game, ctx) => {
     game.invaderspeed = 0
 
   }
+}
+
+const controlBeam = (game, ctx) => {
+  if (game.beamPresent) {
+    game.beamPos.y -= 10
+    ctx.fillText("|", game.beamPos.x, game.beamPos.y)
+    if (game.beamPos.y <= 0) {
+      game.beamPresent = false
+    }
+  }
+}
+
+const drawGame = (game, ctx) => {
+  let frame = 0
   ctx.clearRect(0, 0, game.width, game.height);
+  controlInvaders(game)
+  controlBeam(game, ctx)
   game['tables'][game['level']].map((line, index) => {
-    ctx.fillText(line[fr], game.width / 2 + game.swingState, game.invadersTop + index * 50)
+    ctx.fillText(line[fr], game.width / 2 + game.swingState, game.invadersTop + index * game.spriteSize)
   })
- 
+
 
 }
 
@@ -50,14 +65,14 @@ const drawTank = (game, ctx) => {
   ctx.fillText('Q', game.tankpos, game.height)
 }
 
-gameDraw = function (game, dt, ctx) {
+gameDraw = function (game, ctx) {
   ctx.font = `${game.spriteSize}px invaders`;
   ctx.fillStyle = '#ffffff';
   ctx.textBaseline = "center";
   ctx.textAlign = "center";
   let invaderHop = 0
   setInterval(() => {
-    drawInvaders(game, ctx)
+    drawGame(game, ctx)
     drawTank(game, ctx)
   }, game.fps);
 
@@ -74,7 +89,14 @@ gameDraw = function (game, dt, ctx) {
   const goLeft = () => { if (gameState.tankpos > gameState.spriteSize) { gameState.tankpos -= 10 } }
   const goRight = () => { if (gameState.tankpos < gameState.width - gameState.spriteSize) { gameState.tankpos += 10 } }
 
-  const shootBeam = () => {}
+  const shootBeam = () => {
+    if (!gameState.beamPresent) {
+      gameState.beamPos.x = gameState.tankpos
+      gameState.beamPos.y = gameState.height
+      gameState.beamPresent = true
+    }
+
+  }
 
 
   const keymap = {
@@ -121,8 +143,10 @@ gameDraw = function (game, dt, ctx) {
     tankpos: 0,
     invaderspeed: 1,
     invadersTop: 50,
-    gameSpeed: 10,
-    spriteSize: 50
+    gameSpeed: 5,
+    spriteSize: 50,
+    beamPresent: false,
+    beamPos: { x: 0, y: 0 }
   }
 
   let stateStack = []
@@ -144,12 +168,12 @@ gameDraw = function (game, dt, ctx) {
     const gameCanvas = document.querySelector("#gameCanvas");
     gameState.width = window.innerWidth - 200
     gameState.height = window.innerHeight - 200
-    gameState.tankpos = window.innerHeight - 200 / 2
+    gameState.tankpos = (window.innerWidth - 200) / 2
     gameCanvas.width = gameState.width
     gameCanvas.height = gameState.height
     if (stateFn) {
       let ctx = gameCanvas.getContext('2d');
-      stateFn(gameState, null, ctx)
+      stateFn(gameState, ctx)
     }
   }
 

@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Starfield</title>
+    <title>SPACE INVADERS v1.0</title>
     <style>
       @font-face {
         font-family: 'invaders';
-        src: url('./pixel-invaders.ttf');
-    }
+        src: url('./finally.ttf');
+      }
+      
+      @font-face {
+        font-family: 'arcade';
+        src: url('./ARCADECLASSIC.TTF');
+      }
 
 
       body, html {
@@ -15,6 +20,7 @@
 		    margin: 0;
 		    padding: 0;
         overflow: hidden;
+        background: black;
 
         display: flex;
         justify-content: center;
@@ -43,6 +49,7 @@
     <div id="container"></div>
     <canvas id="gameCanvas"></canvas>
   </body>
-  <script src="starfield.js"></script>
+  <script src="stars.js"></script>
+  <script src="spriteClasses.js"></script>
   <script src="spaceinvaders.js"></script>
 </html>
